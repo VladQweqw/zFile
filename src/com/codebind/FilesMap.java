@@ -7,8 +7,6 @@ import java.util.Map;
 
 public class FilesMap {
     public static HashMap<String, String> toRenameMatrix = new HashMap<>();
-    private static HashMap<String, String> temp = new HashMap<>();
-
     public static void updateItem(File file, String new_name) {
         if(file != null) {
             toRenameMatrix.replace(file.getAbsolutePath(), new_name);
@@ -34,14 +32,6 @@ public class FilesMap {
         };
 
         return null;
-    }
-
-    public static void removeOldAddNew(String old_key, File new_key, String new_val) {
-        temp.put(new_key.getAbsolutePath(), new_val);
-    }
-
-    public static void replaceArrays() {
-        toRenameMatrix = temp;
     }
 
     public static String removeExtension(File path) {
