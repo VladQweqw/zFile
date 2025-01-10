@@ -17,11 +17,10 @@ public class App {
     private final JFrame frame = new JFrame("FileEdit");
     private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
     private JList<String> list;
-    private String current_path = "";
+    private String current_path;
     private final HashSet<String> selected_files = new HashSet<>();
     private boolean select_all_flag = false;
-    private HashSet<String> selected_options = new HashSet<String>();
-    private ArrayList<File> fileList = new ArrayList<>();
+    private final HashSet<String> selected_options = new HashSet<String>();
     private ArrayList<String> fileNames = new ArrayList<>();
 
     // class instances
@@ -464,7 +463,7 @@ public class App {
     private void readDirFiles(File folder) {
         FilesMap.toRenameMatrix = new HashMap<>();
         this.fileNames = new ArrayList<>();
-        this.fileList = new ArrayList<>();
+        ArrayList<File> fileList = new ArrayList<>();
 
         File[] files = folder.listFiles();
 
@@ -472,7 +471,7 @@ public class App {
             for(File file : files) {
                 this.fileNames.add(FilesMap.removeExtension(file));
                 FilesMap.toRenameMatrix.put(file.getAbsolutePath(), FilesMap.removeExtension(file));
-                this.fileList.add(file);
+                fileList.add(file);
             }
         }
 
