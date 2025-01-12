@@ -2,7 +2,7 @@
   <artifact type="jar" name="untitled:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/untitled_jar</output-path>
     <root id="archive" name="untitled.jar">
-      <element id="module-output" name="FileEdit" />
+      <element id="module-output" name="zFile" />
     </root>
   </artifact>
 </component>
