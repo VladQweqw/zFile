@@ -1,4 +1,4 @@
-package app.options;
+package app.pages.Rename.options;
 
 import java.util.ArrayList;
 import java.util.HashMap;

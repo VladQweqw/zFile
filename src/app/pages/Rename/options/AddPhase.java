@@ -1,7 +1,7 @@
-package app.options;
+package app.pages.Rename.options;
 
 
-import app.FilesMap;
+import app.pages.Rename.FilesMap;
 
 import java.io.File;
 import java.util.ArrayList;

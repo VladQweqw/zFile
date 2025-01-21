@@ -1,4 +1,4 @@
-package app;
+package app.pages.Rename;
 
 import java.io.File;
 import java.util.HashMap;
@@ -34,8 +34,6 @@ public class FilesMap {
     }
 
     public static String removeExtension(File path) {
-
-
         for(int i = 0; i < path.getName().length(); i++) {
             if(path.getName().charAt(i) == '.') {
                 return path.getName().substring(0, i);

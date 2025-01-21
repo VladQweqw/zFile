@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="zFile:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/zFile_jar</output-path>
+    <root id="archive" name="zFile.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/src/resources/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="zFile" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/dependencies/flatlaf.jar" path-in-jar="/" />
+      <element id="library" level="project" name="FlatLaf" />
+    </root>
+  </artifact>
+</component>
