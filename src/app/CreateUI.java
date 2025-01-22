@@ -13,7 +13,7 @@ import java.net.URI;
 
 public class CreateUI {
     private static JFrame frame = new JFrame("zFile");
-    private final String version = "1.3.0";
+    private final String version = "1.3.1";
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private JPanel rename_app;
@@ -108,7 +108,7 @@ public class CreateUI {
             public void mouseClicked(MouseEvent e) {
                 try {
                     Desktop.getDesktop().browse(
-                            new URI("https://fileedit.netlify.app/")
+                            new URI("https://zfile.netlify.app/")
                     );
                 }catch(Exception ex) {
                     System.out.println("Website doesnt open");

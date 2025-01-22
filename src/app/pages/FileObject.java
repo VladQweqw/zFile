@@ -1,11 +1,10 @@
-package app.pages.Group;
+package app.pages;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
-import java.util.ArrayList;
 import java.util.Date;
 
 public class FileObject {
@@ -23,6 +22,24 @@ public class FileObject {
         };
 
         return null;
+    }
+
+    public static String removeExtension(String name) {
+        for(int i = name.length() - 1; i > 0; i--) {
+            if(name.charAt(i) == '.') {
+                return name.substring(0, i);
+            }
+        }
+
+        return name;
+    }
+
+    public void setName(String new_name) {
+        if(getExtension(new_name) != null) {
+            this.edited_name = removeExtension(new_name);
+        }else {
+            this.edited_name = new_name;
+        }
     }
 
     public String convertMonth(int month) {
@@ -54,11 +71,9 @@ public class FileObject {
     public FileObject(File file) {
         this.name = file.getName();
         this.path = file.getAbsolutePath();
-        this.edited_name = file.getName();
+        setName(file.getName());
         this.extension = getExtension(file.getName());
         this.date_formated = formatDate(file);
-
-        System.out.println(this.toString());
     }
 
     public Path getPath() {

@@ -1,9 +1,8 @@
 package app.pages.Rename.options;
 
 
-import app.pages.Rename.FilesMap;
+import app.pages.FileObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -29,14 +28,14 @@ public class RemovePhase extends Option {
     }
 
     @Override
-    public ArrayList<String> implement(HashSet<String> files, ArrayList<String> FileNames) {
+    public ArrayList<String> implement(HashSet<String> files, ArrayList<FileObject> FileNames) {
         ArrayList<String> new_arr = new ArrayList<>();
 
         for(int i = 0; i < FileNames.size(); i++) {
-            String file_name = FileNames.get(i);
-            File current_file = FilesMap.getByName(file_name);
+            FileObject file = FileNames.get(i);
+            String name = file.edited_name;
 
-            if (files.contains(file_name)) {
+            if (files.contains(name)) {
                 String case_insensitive = "";
                 String cp = phase;
 
@@ -46,24 +45,26 @@ public class RemovePhase extends Option {
                 }
 
                 if(this.replace_all) {
-                    new_arr.add(file_name.replaceAll(case_insensitive + cp, ""));
-                    FilesMap.updateItem(current_file, file_name.replaceAll(case_insensitive + cp, ""));
+                    String new_name = name.replaceAll(case_insensitive + cp, "");
 
+                    new_arr.add(new_name);
+                    file.setName(new_name);
                 }else {
-                    if(!caseSensitive) {
-                        file_name = file_name.replaceFirst(phase.toUpperCase(), "");
-                        file_name = file_name.replaceFirst(phase.toLowerCase(), "");
 
-                        FilesMap.updateItem(current_file, file_name);
+                    if(!caseSensitive) {
+                        name.replaceFirst(phase.toUpperCase(), "");
+                        name.replaceFirst(phase.toLowerCase(), "");
+
+                        file.setName(name);
                     }else {
-                        file_name = file_name.replaceFirst(phase, "");
-                        FilesMap.updateItem(current_file, file_name);
+                        name.replaceFirst(phase, "");
+                        file.setName(name);
                     }
 
-                    new_arr.add(file_name);
+                    new_arr.add(name);
                 }
             } else {
-                new_arr.add(file_name);
+                new_arr.add(name);
             }
         }
 

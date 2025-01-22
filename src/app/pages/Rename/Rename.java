@@ -8,32 +8,36 @@ import java.awt.event.*;
 import java.io.File;
 import java.util.*;
 
+import app.pages.FileObject;
 import app.pages.Rename.options.*;
 import app.pages.Page;
 
 import static app.pages.Rename.options.Option.option_btns;
 
 public class Rename extends Page {
-    private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-
-    private JList<String> list;
+    // variables
     private String current_path;
-    private final HashSet<String> selected_files = new HashSet<>();
+    private ArrayList<FileObject> filesList = new ArrayList<>();
+    private ArrayList<String> displayFiles = new ArrayList<>();
     private boolean select_all_flag = false;
+    private final HashSet<String> selected_files = new HashSet<>();
     private final HashSet<String> selected_options = new HashSet<String>();
-    private ArrayList<String> fileNames = new ArrayList<>();
 
-    // class instances
-    Increment Option_Increment = new Increment();
-    LowerCase Option_Lowercase = new LowerCase();
-    UpperCase Option_Uppercase = new UpperCase();
-    AddPhase Option_AddPhase = new AddPhase();
-    RemovePhase Option_RemovePhase = new RemovePhase();
+    // components
+    private JList<String> list;
+    private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+    private JFrame frame;
+    private JLabel filesTitle = new JLabel("Files");
+    private JTextField search_bar = new JTextField(this.current_path);
+    private JButton fileChooserBtn = new JButton("Select from PC");
+    private JButton manualPathBtn = new JButton("Scan");
+    private JScrollPane listElement;
+    private JScrollPane optionsMenu;
+    private JCheckBox select_all = new JCheckBox("Select all");
+    private JButton renameBtn = new JButton("Rename selected");
 
-    // create components
-    private JButton createFileExplorer() {
-        JButton fileChooserBtn = new JButton("Select from PC");
-
+    // listeners
+    private void ListenerFileExplorer() {
         fileChooserBtn.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
 
@@ -49,15 +53,13 @@ public class Rename extends Page {
             }
         });
 
-        return fileChooserBtn;
     }
-    private JButton createManualPathButton(JTextField inp) {
-        JButton manualPathBtn = new JButton("Scan");
+    private void ListenerManualPathButton() {
         manualPathBtn.setPreferredSize(new Dimension(100, 30));
 
         manualPathBtn.addActionListener(e -> {
             try {
-                String path = inp.getText();
+                String path = search_bar.getText();
 
                 if(!new File(path).isDirectory()) {
                     throw new NotDirectory();
@@ -65,6 +67,7 @@ public class Rename extends Page {
 
                 this.current_path = path;
                 readDirFiles(new File(path));
+
             }
             catch(NotDirectory exc) {
                 exc.printStackTrace();
@@ -80,12 +83,8 @@ public class Rename extends Page {
                 System.out.println("Nu ai pus text");
             }
         });
-
-
-
-        return manualPathBtn;
     }
-    private JScrollPane createOptionsMenu() {
+    private void ListenerOptionsMenu() {
         JPanel btn_wrappers = new JPanel();
 
         for(Map.Entry<String, String> entry : option_btns.entrySet()) {
@@ -99,23 +98,18 @@ public class Rename extends Page {
             btn_wrappers.add(btn);
         }
 
-        JScrollPane scrollPane = new JScrollPane(
+        optionsMenu = new JScrollPane(
                 btn_wrappers,
                 JScrollPane.VERTICAL_SCROLLBAR_NEVER,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-        scrollPane.setPreferredSize(new Dimension(480, 65));
+        optionsMenu.setPreferredSize(new Dimension(480, 65));
 
-        return scrollPane;
     }
-    private JSeparator getSeparator() {
-        JSeparator separator = new JSeparator();
-        separator.setPreferredSize(new Dimension(480, 1));
+    private void ListenerFilesList() {
 
-        return separator;
-    }
-    private JScrollPane createFilesList() {
-        DefaultListModel<String> listModel = new DefaultListModel<>();
+
+        DefaultListModel<String > listModel = new DefaultListModel<>();
         list = new JList<>(listModel);
         updateFileList(listModel);
 
@@ -127,9 +121,9 @@ public class Rename extends Page {
                 label.setBackground(new Color(0x8E24AA));
 
                 selected_files.clear();
-                selected_files.addAll(fileNames);
-
-
+                for(FileObject file : filesList) {
+                    selected_files.add(file.edited_name);
+                }
             }else {
                 if(isSelected) {
                     label.setBackground(new Color(0x8E24AA));
@@ -151,18 +145,119 @@ public class Rename extends Page {
             public void keyPressed(KeyEvent e) {
                 if ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0 && e.getKeyCode() == KeyEvent.VK_A) {
                     selected_files.clear();
-                    selected_files.addAll(fileNames);
+                    for(FileObject file : filesList) {
+                        selected_files.add(file.edited_name);
+                    }
                 }
             }
         });
 
-        JScrollPane jScrollPane = new JScrollPane(list);
-        jScrollPane.setPreferredSize(new Dimension(480, 225));
+        listElement = new JScrollPane(list);
+        listElement.setPreferredSize(new Dimension(480, 225));
 
-        return jScrollPane;
+    }
+    private void ListenerSelectAll() {
+        select_all.setPreferredSize(new Dimension(250, 30));
+
+        select_all.addActionListener(e -> {
+            this.select_all_flag = select_all.isSelected();
+            updateFileList((DefaultListModel<String>) list.getModel());
+        });
+    }
+    private void ListenerRenameBtn() {
+        renameBtn.addActionListener(e -> {
+
+            for(String name : displayFiles) {
+                for(FileObject file : filesList) {
+                    System.out.println(file.edited_name + " " + name + " ");
+                    if(file.edited_name.equals(name)) {
+                        File new_name = new File(new File(file.path).getParent() + File.separator + file.edited_name + file.extension);
+                        File current = new File(file.path);
+
+                        if(current.renameTo(new_name)) {
+                            System.out.println("Renamed " + file.edited_name);
+                        }else {
+                            System.out.println("!!! Errror" + file.edited_name);
+                        }
+                    }
+                }
+            }
+            readDirFiles(new File(this.current_path));
+            JOptionPane.showMessageDialog(
+                    panel,
+                    "Succesfully renamed selected files!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+        });
     }
 
-    // popups
+    // class instances
+    Increment Option_Increment = new Increment();
+    LowerCase Option_Lowercase = new LowerCase();
+    UpperCase Option_Uppercase = new UpperCase();
+    AddPhase Option_AddPhase = new AddPhase();
+    RemovePhase Option_RemovePhase = new RemovePhase();
+
+    // methods
+    private void updateFileList(DefaultListModel<String> listModel) {
+        listModel.clear();
+        selected_files.clear();
+
+        for(String file : displayFiles) {
+            listModel.addElement(file);
+        }
+        filesTitle.setText(
+                "Files (" + this.filesList.size() + " files)"
+        );
+    }
+    private void previewOptions() {
+        ArrayList<String> arr = new ArrayList<>();
+            if(this.selected_options.contains(Option_Increment.name_id)) {
+                arr = Option_Increment.implement(this.selected_files, filesList);
+                this.selected_options.remove("increment");
+
+            }
+            if(this.selected_options.contains(Option_AddPhase.name_id)) {
+                arr = Option_AddPhase.implement(this.selected_files, filesList);
+                this.selected_options.remove("add_phase");
+
+            }
+            if(this.selected_options.contains(Option_RemovePhase.name_id)) {
+                arr = Option_RemovePhase.implement(this.selected_files, filesList);
+                this.selected_options.remove("remove_phase");
+
+            }
+            if(this.selected_options.contains(Option_Lowercase.name_id)) {
+                arr = Option_Lowercase.implement(this.selected_files, filesList);
+                this.selected_options.remove("lowercase");
+
+            }
+            if(this.selected_options.contains(Option_Uppercase.name_id)) {
+                arr = Option_Uppercase.implement(this.selected_files, filesList);
+                this.selected_options.remove("uppercase");
+            }
+
+        this.displayFiles = arr;
+        updateFileList((DefaultListModel<String>) list.getModel());
+    }
+    private void readDirFiles(File folder) {
+        File[] files = folder.listFiles();
+        this.filesList = new ArrayList<>();
+
+        if(files != null) {
+            for(File file : files) {
+                this.filesList.add(new FileObject(file));
+            }
+
+            for(FileObject file : filesList) {
+                this.displayFiles.add(
+                        FileObject.removeExtension(file.edited_name)
+                );
+            }
+        }
+
+        updateFileList((DefaultListModel<String>) list.getModel());
+    }
     private void openInputPopup(String type) {
         JDialog popup = new JDialog();
 
@@ -304,7 +399,6 @@ public class Rename extends Page {
 
         return popup;
     }
-
     private JDialog RemovePhasePopup() {
         JDialog popup = new JDialog(frame, "Enter details", true);
 
@@ -372,123 +466,19 @@ public class Rename extends Page {
         return popup;
     }
 
-    // file list
-    private void updateFileList(DefaultListModel<String> listModel) {
-        listModel.clear();
-        selected_files.clear();
-
-        for(String item: fileNames) {
-            listModel.addElement(item);
-        }
-        filesTitle.setText(
-                "Files (" + this.fileNames.size() + " files)"
-        );
-    }
-    private JCheckBox select_all() {
-        JCheckBox select_all = new JCheckBox("Select all");
-        select_all.setPreferredSize(new Dimension(250, 30));
-        JCheckBox finalSelect_all = select_all;
-
-        select_all.addActionListener(e -> {
-            this.select_all_flag = finalSelect_all.isSelected();
-            updateFileList((DefaultListModel<String>) list.getModel());
-        });
-
-        return select_all;
-    }
-    private void previewOptions() {
-        ArrayList<String> arr = new ArrayList<>();
-            if(this.selected_options.contains(Option_Increment.name_id)) {
-                arr = Option_Increment.implement(this.selected_files, fileNames);
-                this.selected_options.remove("increment");
-
-            }
-            if(this.selected_options.contains(Option_AddPhase.name_id)) {
-                arr = Option_AddPhase.implement(this.selected_files, fileNames);
-                this.selected_options.remove("add_phase");
-
-            }
-            if(this.selected_options.contains(Option_RemovePhase.name_id)) {
-                arr = Option_RemovePhase.implement(this.selected_files, fileNames);
-                this.selected_options.remove("remove_phase");
-
-            }
-            if(this.selected_options.contains(Option_Lowercase.name_id)) {
-                arr = Option_Lowercase.implement(this.selected_files, fileNames);
-                this.selected_options.remove("lowercase");
-
-            }
-            if(this.selected_options.contains(Option_Uppercase.name_id)) {
-                arr = Option_Uppercase.implement(this.selected_files, fileNames);
-                this.selected_options.remove("uppercase");
-            }
-
-
-
-        this.fileNames = arr;
-        updateFileList((DefaultListModel<String>) list.getModel());
-    }
-    private JButton renameFiles() {
-        JButton renameBtn = new JButton("Rename selected");
-        renameBtn.addActionListener(e -> {
-
-            for(Map.Entry<String, String> entry : FilesMap.toRenameMatrix.entrySet()) {
-                File current = new File(entry.getKey());
-                String extension = FilesMap.getExtension(current);
-
-                File new_name = new File(current.getParent() + "\\" + entry.getValue() + extension);
-
-                if(current.renameTo(new_name)) {
-                    System.out.println("Renamed " + entry.getValue());
-                }else {
-                    System.out.println("!!! Errror" + entry.getValue());
-                }
-            }
-            readDirFiles(new File(this.current_path));
-            JOptionPane.showMessageDialog(
-                    panel,
-                    "Succesfully renamed selected files!",
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE);
-        });
-
-        return renameBtn;
-    }
-    private void readDirFiles(File folder) {
-        System.out.println("READ");
-        FilesMap.toRenameMatrix = new HashMap<>();
-        this.fileNames = new ArrayList<>();
-        ArrayList<File> fileList = new ArrayList<>();
-
-        File[] files = folder.listFiles();
-
-        if(files != null) {
-            for(File file : files) {
-                this.fileNames.add(FilesMap.removeExtension(file));
-                FilesMap.toRenameMatrix.put(file.getAbsolutePath(), FilesMap.removeExtension(file));
-                fileList.add(file);
-            }
-        }
-
-        updateFileList((DefaultListModel<String>) list.getModel());
-    }
-    private JLabel filesTitle = new JLabel("Files");
-
-    private JTextField search_bar = new JTextField(this.current_path);
-
-    private JFrame frame;
-    // app
+    // constructor
     public Rename(JFrame frame) {
         this.frame = frame;
 
-        // path search si filde explorer
         search_bar.setPreferredSize(new Dimension(325, 30));
 
         panel.add(search_bar);
-        panel.add(createManualPathButton(search_bar));
+        ListenerManualPathButton();
+        panel.add(manualPathBtn);
 
         // File explorer
-        panel.add(createFileExplorer());
+        ListenerFileExplorer();
+        panel.add(fileChooserBtn);
 
         // options menu
         JLabel optionsTitle = new JLabel("Options");
@@ -498,10 +488,11 @@ public class Rename extends Page {
 
 
         // options menu
-        panel.add(createOptionsMenu());
+        ListenerOptionsMenu();
+        panel.add(optionsMenu);
 
         // separator
-        panel.add(getSeparator());
+        panel.add(new JSeparator());
 
         // files list
         filesTitle.setPreferredSize(new Dimension(500, 30));
@@ -510,12 +501,16 @@ public class Rename extends Page {
         panel.add(filesTitle);
 
         // checkbox and rename button
-        panel.add(createFilesList());
+        ListenerFilesList();
+        panel.add(listElement);
 
         // options and button
-        panel.add(select_all());
-        panel.add(renameFiles());
+        ListenerSelectAll();
+        panel.add(select_all);
 
+        // rename btn
+        ListenerRenameBtn();
+        panel.add(renameBtn);
 
         // panel options
         panel.setBorder(BorderFactory.createEmptyBorder(0,10,0,10));

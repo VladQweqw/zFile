@@ -1,6 +1,7 @@
 package app.pages.Group;
 
 import app.exceptions.FailToMove;
+import app.pages.FileObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,15 +68,15 @@ public class Options {
                         }
 
                         // if all 3
-                        dest_folder = new File(day_dir.toPath() + "\\" + file.edited_name).toPath();
+                        dest_folder = new File(day_dir.toPath() + "\\" + file.name).toPath();
                     }else {
                         // if only the year and month
-                        dest_folder = new File(month_dir.toPath() + "\\" + file.edited_name).toPath();
+                        dest_folder = new File(month_dir.toPath() + "\\" + file.name).toPath();
                     }
 
                 }else {
                     // if only the year
-                    dest_folder = new File(year_dir.toPath() + "\\" + file.edited_name).toPath();
+                    dest_folder = new File(year_dir.toPath() + "\\" + file.name).toPath();
                 }
 
                 if(!moveFile(file.getPath(), dest_folder)) {

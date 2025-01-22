@@ -1,9 +1,8 @@
 package app.pages.Rename.options;
 
 
-import app.pages.Rename.FilesMap;
+import app.pages.FileObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -18,19 +17,20 @@ public class LowerCase extends Option {
         this.name_id = "lowercase";
     }
     @Override
-    public ArrayList<String> implement(HashSet<String> files, ArrayList<String> FileNames) {
+    public ArrayList<String> implement(HashSet<String> files, ArrayList<FileObject> FileNames) {
         ArrayList<String> new_arr = new ArrayList<>();
 
         for(int i = 0; i < FileNames.size(); i++) {
-            String file_name = FileNames.get(i);
-            File current_file = FilesMap.getByName(file_name);
+            FileObject file = FileNames.get(i);
+            String name = file.edited_name;
 
-            if (files.contains(file_name)) {
-                new_arr.add(file_name.toLowerCase());
-                FilesMap.updateItem(current_file,  file_name.toLowerCase());
+            if (files.contains(name)) {
+                String new_name = name.toLowerCase();
 
+                new_arr.add(new_name);
+                file.setName(new_name);
             } else {
-                new_arr.add(file_name);
+                new_arr.add(name);
             }
         }
 

@@ -1,5 +1,7 @@
 package app.pages.Rename.options;
 
+import app.pages.FileObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,5 +13,5 @@ public abstract class Option {
        option_btns.put(name, id_name);
     }
 
-    public abstract ArrayList<String> implement(HashSet<String> y, ArrayList<String> z);
+    public abstract ArrayList<String> implement(HashSet<String> y, ArrayList<FileObject> z);
 }

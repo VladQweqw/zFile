@@ -1,9 +1,8 @@
 package app.pages.Rename.options;
 
 
-import app.pages.Rename.FilesMap;
+import app.pages.FileObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -27,22 +26,22 @@ public class AddPhase extends Option {
     }
 
     @Override
-    public ArrayList<String> implement(HashSet<String> files, ArrayList<String> FileNames) {
+    public ArrayList<String> implement(HashSet<String> files, ArrayList<FileObject> FileNames) {
         ArrayList<String> new_arr = new ArrayList<>();
 
         for(int i = 0; i < FileNames.size(); i++) {
-            String file_name = FileNames.get(i);
+            FileObject file = FileNames.get(i);
+            String name = file.edited_name;
 
-            if (files.contains(file_name)) {
-                StringBuilder sb = new StringBuilder(file_name);
-                File current_file = FilesMap.getByName(file_name);
+            if (files.contains(name)) {
+                StringBuilder sb = new StringBuilder(name);
 
-                String new_file =   sb.insert(index, phase).toString();
+                String new_name = sb.insert(index, phase).toString();
 
-                new_arr.add(new_file);
-                FilesMap.updateItem(current_file, new_file);
+                file.setName(new_name);
+                new_arr.add(new_name);
             } else {
-                new_arr.add(file_name);
+                new_arr.add(name);
             }
         }
 

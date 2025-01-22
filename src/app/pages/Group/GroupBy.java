@@ -1,6 +1,7 @@
 package app.pages.Group;
 
 import app.exceptions.NotDirectory;
+import app.pages.FileObject;
 import app.pages.Page;
 
 import javax.swing.*;
